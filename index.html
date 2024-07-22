@@ -3,123 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Printing Cost Calculator Form</title>
+    <title>3D Printing Cost Calculator</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            font-family: 'Arial', sans-serif;
+            background-color: #F7F9F2;
+            color: #333;
+            margin: 0;
+            padding: 20px;
         }
-        .form-section, .owner-section {
-            max-width: 600px;
+        .container {
+            max-width: 800px;
             margin: auto;
             padding: 20px;
-            border: 1px solid #ccc;
+            background-color: #FFFFFF;
             border-radius: 10px;
-            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-        input[type="text"], input[type="number"], input[type="button"], select {
+        .header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #E8C5E5;
+        }
+        .header h1 {
+            color: #F19ED2;
+            font-size: 2.5em;
+            margin: 0;
+        }
+        .form-section, .owner-section {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #E8C5E5;
+            border-radius: 10px;
+            background-color: #FFFFFF;
+        }
+        h2 {
+            color: #91DDCF;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            color: #666;
+        }
+        input[type="text"], input[type="number"], select, input[type="file"] {
             width: 100%;
             padding: 10px;
-            margin: 10px 0;
+            margin: 5px 0 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        input[type="checkbox"] {
+            margin-right: 10px;
         }
         input[type="button"] {
-            background-color: #4CAF50;
+            background-color: #91DDCF;
             color: white;
+            padding: 10px 15px;
             border: none;
+            border-radius: 5px;
             cursor: pointer;
+            font-size: 1em;
         }
         input[type="button"]:hover {
-            background-color: #45a049;
+            background-color: #79CAB8;
         }
         canvas {
             display: none;
+        }
+        .cost-breakdown {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #F7F9F2;
+            border-radius: 10px;
+            border: 1px solid #E8C5E5;
         }
     </style>
 </head>
 <body>
 
-<div class="form-section">
-    <h2>User Form</h2>
-    <label for="email">Recipient Email:</label>
-    <input type="text" id="email" placeholder="Enter recipient email">
+<div class="container">
+    <div class="header">
+        <h1>3D Printing Cost Calculator</h1>
+    </div>
 
-    <label for="objectLink">Link to Object:</label>
-    <input type="text" id="objectLink" placeholder="Enter link to object">
+    <div class="form-section">
+        <h2>User Form</h2>
+        <label for="email">Recipient Email:</label>
+        <input type="text" id="email" placeholder="Enter recipient email">
 
-    <label for="layerHeight">Select Layer Height (mm):</label>
-    <select id="layerHeight">
-        <option value="0.06">0.06 mm</option>
-        <option value="0.12">0.12 mm</option>
-        <option value="0.20">0.20 mm</option>
-        <option value="0.30">0.30 mm</option>
-        <option value="0.45">0.45 mm</option>
-    </select>
+        <label for="objectLink">Link to Object:</label>
+        <input type="text" id="objectLink" placeholder="Enter link to object">
 
-    <label for="infill">Select Infill Percentage:</label>
-    <select id="infill">
-        <option value="0">0% Infill</option>
-        <option value="10">10% Infill</option>
-        <option value="20">20% Infill</option>
-        <option value="50">50% Infill</option>
-        <option value="100">100% Infill</option>
-    </select>
+        <label for="layerHeight">Select Layer Height (mm):</label>
+        <select id="layerHeight">
+            <option value="0.06">0.06 mm</option>
+            <option value="0.12">0.12 mm</option>
+            <option value="0.20">0.20 mm</option>
+            <option value="0.30">0.30 mm</option>
+            <option value="0.45">0.45 mm</option>
+        </select>
 
-    <label for="material">Select Material:</label>
-    <select id="material">
-        <option value="PLA">PLA - 60 PLN/kg</option>
-        <option value="PETG">PETG - 100 PLN/kg</option>
-    </select>
+        <label for="infill">Select Infill Percentage:</label>
+        <select id="infill">
+            <option value="0">0% Infill</option>
+            <option value="10">10% Infill</option>
+            <option value="20">20% Infill</option>
+            <option value="50">50% Infill</option>
+            <option value="100">100% Infill</option>
+        </select>
 
-    <label for="cleanup">Select Cleanup Option:</label>
-    <input type="checkbox" id="cleanupBasic" value="0.1"> Basic Cleanup (10% fee)
-    <br>
-    <input type="checkbox" id="cleanupFull" value="0.5"> Full Cleanup and Sanding (50% fee)
-    <br>
-    <input type="button" value="Confirm and Download" onclick="confirmAndDownload()">
+        <label for="material">Select Material:</label>
+        <select id="material">
+            <option value="PLA">PLA - 60 PLN/kg</option>
+            <option value="PETG">PETG - 100 PLN/kg</option>
+        </select>
+
+        <label for="cleanup">Select Cleanup Option:</label>
+        <input type="checkbox" id="cleanupBasic" value="0.1"> Basic Cleanup (10% fee)
+        <br>
+        <input type="checkbox" id="cleanupFull" value="0.5"> Full Cleanup and Sanding (50% fee)
+        <br>
+        <input type="button" value="Confirm and Download" onclick="confirmAndDownload()">
+    </div>
+
+    <div class="owner-section">
+        <h2>Owner Section</h2>
+        <label for="ownerImport">Import Data:</label>
+        <input type="file" id="ownerImport" accept=".txt" onchange="importData(event)">
+
+        <label for="ownerEmail">Recipient Email:</label>
+        <input type="text" id="ownerEmail" disabled>
+
+        <label for="ownerObjectLink">Link to Object:</label>
+        <input type="text" id="ownerObjectLink" disabled>
+
+        <label for="ownerLayerHeight">Layer Height (mm):</label>
+        <input type="text" id="ownerLayerHeight" disabled>
+
+        <label for="ownerInfill">Infill Percentage:</label>
+        <input type="text" id="ownerInfill" disabled>
+
+        <label for="ownerMaterial">Material:</label>
+        <input type="text" id="ownerMaterial" disabled>
+
+        <label for="ownerCleanupBasic">Basic Cleanup:</label>
+        <input type="checkbox" id="ownerCleanupBasic" disabled>
+
+        <label for="ownerCleanupFull">Full Cleanup and Sanding:</label>
+        <input type="checkbox" id="ownerCleanupFull" disabled>
+
+        <label for="printTime">Print Time (hours):</label>
+        <input type="number" id="printTime" min="0" step="0.1">
+
+        <label for="materialUsed">Material Used (grams):</label>
+        <input type="number" id="materialUsed" min="0" step="0.1">
+
+        <input type="button" value="Calculate Cost" onclick="calculateCost()">
+        <input type="button" value="Generate Cost Breakdown Image" onclick="generateCostBreakdownImage()">
+    </div>
+
+    <div class="cost-breakdown">
+        <h3>Cost Breakdown:</h3>
+        <p id="materialCost">Material Cost: 0 PLN</p>
+        <p id="electricityCost">Electricity Cost: 0 PLN</p>
+        <p id="workFee">Work Fee (25%): 0 PLN</p>
+        <p id="cleanupFee">Cleanup Fee: 0 PLN</p>
+        <p id="totalCost">Total Cost: 0 PLN</p>
+    </div>
 </div>
-
-<div class="owner-section">
-    <h2>Owner Section</h2>
-    <label for="ownerImport">Import Data:</label>
-    <input type="file" id="ownerImport" accept=".txt" onchange="importData(event)">
-
-    <label for="ownerEmail">Recipient Email:</label>
-    <input type="text" id="ownerEmail" disabled>
-
-    <label for="ownerObjectLink">Link to Object:</label>
-    <input type="text" id="ownerObjectLink" disabled>
-
-    <label for="ownerLayerHeight">Layer Height (mm):</label>
-    <input type="text" id="ownerLayerHeight" disabled>
-
-    <label for="ownerInfill">Infill Percentage:</label>
-    <input type="text" id="ownerInfill" disabled>
-
-    <label for="ownerMaterial">Material:</label>
-    <input type="text" id="ownerMaterial" disabled>
-
-    <label for="ownerCleanupBasic">Basic Cleanup:</label>
-    <input type="checkbox" id="ownerCleanupBasic" disabled>
-
-    <label for="ownerCleanupFull">Full Cleanup and Sanding:</label>
-    <input type="checkbox" id="ownerCleanupFull" disabled>
-
-    <label for="printTime">Print Time (hours):</label>
-    <input type="number" id="printTime" min="0" step="0.1">
-
-    <label for="materialUsed">Material Used (grams):</label>
-    <input type="number" id="materialUsed" min="0" step="0.1">
-
-    <input type="button" value="Calculate Cost" onclick="calculateCost()">
-    <input type="button" value="Generate Cost Breakdown Image" onclick="generateCostBreakdownImage()">
-</div>
-
-<h3>Cost Breakdown:</h3>
-<p id="materialCost">Material Cost: 0 PLN</p>
-<p id="electricityCost">Electricity Cost: 0 PLN</p>
-<p id="workFee">Work Fee (25%): 0 PLN</p>
-<p id="cleanupFee">Cleanup Fee: 0 PLN</p>
-<p id="totalCost">Total Cost: 0 PLN</p>
 
 <canvas id="costCanvas" width="600" height="400"></canvas>
 
@@ -176,41 +227,21 @@
 
     function importData(event) {
         const file = event.target.files[0];
-        if (!file) {
-            return;
-        }
-
         const reader = new FileReader();
+
         reader.onload = function(e) {
-            const content = e.target.result;
-            const lines = content.trim().split('\n');
+            const data = e.target.result;
+            const lines = data.split('\n');
 
-            const email = lines[1].split(': ')[1].trim();
-            const objectLink = lines[2].split(': ')[1].trim();
-            const layerHeight = lines[3].split(': ')[1].trim().split(' ')[0];
-            const infill = lines[4].split(': ')[1].trim().split('%')[0];
-            const material = lines[5].split(': ')[1].trim().split(' ')[0];
-            const cleanupBasic = lines[6].split(': ')[1].trim() === 'Yes';
-            const cleanupFull = lines[7].split(': ')[1].trim() === 'Yes';
-
-            document.getElementById('ownerEmail').value = email;
-            document.getElementById('ownerObjectLink').value = objectLink;
-            document.getElementById('ownerLayerHeight').value = layerHeight;
-            document.getElementById('ownerInfill').value = infill;
-            document.getElementById('ownerMaterial').value = material;
-            document.getElementById('ownerCleanupBasic').checked = cleanupBasic;
-            document.getElementById('ownerCleanupFull').checked = cleanupFull;
-
-            finalCostData = {
-                email: email,
-                objectLink: objectLink,
-                layerHeight: layerHeight,
-                infill: infill,
-                material: material,
-                cleanupBasic: cleanupBasic,
-                cleanupFull: cleanupFull
-            };
+            document.getElementById('ownerEmail').value = lines[1].split(':')[1].trim();
+            document.getElementById('ownerObjectLink').value = lines[2].split(':')[1].trim();
+            document.getElementById('ownerLayerHeight').value = lines[3].split(':')[1].trim();
+            document.getElementById('ownerInfill').value = lines[4].split(':')[1].trim();
+            document.getElementById('ownerMaterial').value = lines[5].split(':')[1].trim();
+            document.getElementById('ownerCleanupBasic').checked = lines[6].split(':')[1].trim() === 'Yes';
+            document.getElementById('ownerCleanupFull').checked = lines[7].split(':')[1].trim() === 'Yes';
         };
+
         reader.readAsText(file);
     }
 
