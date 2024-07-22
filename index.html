@@ -83,6 +83,27 @@
     <label for="ownerImport">Import Data:</label>
     <input type="file" id="ownerImport" accept=".txt" onchange="importData(event)">
 
+    <label for="ownerEmail">Recipient Email:</label>
+    <input type="text" id="ownerEmail" disabled>
+
+    <label for="ownerObjectLink">Link to Object:</label>
+    <input type="text" id="ownerObjectLink" disabled>
+
+    <label for="ownerLayerHeight">Layer Height (mm):</label>
+    <input type="text" id="ownerLayerHeight" disabled>
+
+    <label for="ownerInfill">Infill Percentage:</label>
+    <input type="text" id="ownerInfill" disabled>
+
+    <label for="ownerMaterial">Material:</label>
+    <input type="text" id="ownerMaterial" disabled>
+
+    <label for="ownerCleanupBasic">Basic Cleanup:</label>
+    <input type="checkbox" id="ownerCleanupBasic" disabled>
+
+    <label for="ownerCleanupFull">Full Cleanup and Sanding:</label>
+    <input type="checkbox" id="ownerCleanupFull" disabled>
+
     <label for="printTime">Print Time (hours):</label>
     <input type="number" id="printTime" min="0" step="0.1">
 
@@ -164,44 +185,54 @@
             const content = e.target.result;
             const lines = content.trim().split('\n');
 
-            document.getElementById('ownerEmail').value = lines[1].split(': ')[1];
-            document.getElementById('ownerObjectLink').value = lines[2].split(': ')[1];
-            document.getElementById('ownerLayerHeight').value = lines[3].split(': ')[1].split(' ')[0];
-            document.getElementById('ownerInfill').value = lines[4].split(': ')[1].split('%')[0];
-            document.getElementById('ownerMaterial').value = lines[5].split(': ')[1].split(' ')[0];
-            document.getElementById('ownerCleanupBasic').checked = lines[6].split(': ')[1] === 'Yes';
-            document.getElementById('ownerCleanupFull').checked = lines[7].split(': ')[1] === 'Yes';
+            const email = lines[1].split(': ')[1].trim();
+            const objectLink = lines[2].split(': ')[1].trim();
+            const layerHeight = lines[3].split(': ')[1].trim().split(' ')[0];
+            const infill = lines[4].split(': ')[1].trim().split('%')[0];
+            const material = lines[5].split(': ')[1].trim().split(' ')[0];
+            const cleanupBasic = lines[6].split(': ')[1].trim() === 'Yes';
+            const cleanupFull = lines[7].split(': ')[1].trim() === 'Yes';
+
+            document.getElementById('ownerEmail').value = email;
+            document.getElementById('ownerObjectLink').value = objectLink;
+            document.getElementById('ownerLayerHeight').value = layerHeight;
+            document.getElementById('ownerInfill').value = infill;
+            document.getElementById('ownerMaterial').value = material;
+            document.getElementById('ownerCleanupBasic').checked = cleanupBasic;
+            document.getElementById('ownerCleanupFull').checked = cleanupFull;
+
+            finalCostData = {
+                email: email,
+                objectLink: objectLink,
+                layerHeight: layerHeight,
+                infill: infill,
+                material: material,
+                cleanupBasic: cleanupBasic,
+                cleanupFull: cleanupFull
+            };
         };
         reader.readAsText(file);
     }
 
     function calculateCost() {
-        const email = document.getElementById('ownerEmail').value;
-        const objectLink = document.getElementById('ownerObjectLink').value;
-        const layerHeight = document.getElementById('ownerLayerHeight').value;
-        const infill = document.getElementById('ownerInfill').value;
-        const material = document.getElementById('ownerMaterial').value;
         const printTime = parseFloat(document.getElementById('printTime').value);
         const materialUsed = parseFloat(document.getElementById('materialUsed').value);
 
-        const cleanupBasicChecked = document.getElementById('ownerCleanupBasic').checked;
-        const cleanupFullChecked = document.getElementById('ownerCleanupFull').checked;
-
-        if (!email || !objectLink || isNaN(printTime) || isNaN(materialUsed)) {
-            alert("Please fill in all fields correctly.");
+        if (isNaN(printTime) || isNaN(materialUsed) || printTime <= 0 || materialUsed <= 0) {
+            alert("Please enter valid print time and material used.");
             return;
         }
 
-        const materialCostPerKg = material === 'PLA' ? filamentCostPerKgPLA : filamentCostPerKgPETG;
+        const materialCostPerKg = finalCostData.material === 'PLA' ? filamentCostPerKgPLA : filamentCostPerKgPETG;
         const materialCost = (materialUsed / 1000) * materialCostPerKg;
-        const electricityCost = printTime * powerConsumption * electricityRatePerKwh; // PLN
+        const electricityCost = printTime * powerConsumption * electricityRatePerKwh;
         const workFee = (materialCost + electricityCost) * workFeePercentage;
 
         let cleanupFee = 0;
-        if (cleanupBasicChecked) {
+        if (finalCostData.cleanupBasic) {
             cleanupFee += (materialCost + electricityCost) * 0.10;
         }
-        if (cleanupFullChecked) {
+        if (finalCostData.cleanupFull) {
             cleanupFee += (materialCost + electricityCost) * 0.50;
         }
 
