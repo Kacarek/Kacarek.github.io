@@ -62,4 +62,200 @@
         <option value="20">20% Infill</option>
         <option value="50">50% Infill</option>
         <option value="100">100% Infill</option>
-    </select
+    </select>
+
+    <label for="material">Select Material:</label>
+    <select id="material">
+        <option value="PLA">PLA - 60 PLN/kg</option>
+        <option value="PETG">PETG - 100 PLN/kg</option>
+    </select>
+
+    <label for="cleanup">Select Cleanup Option:</label>
+    <input type="checkbox" id="cleanupBasic" value="0.1"> Basic Cleanup (10% fee)
+    <br>
+    <input type="checkbox" id="cleanupFull" value="0.5"> Full Cleanup and Sanding (50% fee)
+</div>
+
+<div class="owner-section">
+    <h2>Owner Section</h2>
+    <label for="ownerEmail">Owner Email:</label>
+    <input type="text" id="ownerEmail" placeholder="Enter owner email">
+
+    <label for="ownerObjectLink">Link to Object:</label>
+    <input type="text" id="ownerObjectLink" placeholder="Enter link to object">
+
+    <label for="ownerLayerHeight">Select Layer Height (mm):</label>
+    <select id="ownerLayerHeight">
+        <option value="0.06">0.06 mm</option>
+        <option value="0.12">0.12 mm</option>
+        <option value="0.20">0.20 mm</option>
+        <option value="0.30">0.30 mm</option>
+        <option value="0.45">0.45 mm</option>
+    </select>
+
+    <label for="ownerInfill">Select Infill Percentage:</label>
+    <select id="ownerInfill">
+        <option value="0">0% Infill</option>
+        <option value="10">10% Infill</option>
+        <option value="20">20% Infill</option>
+        <option value="50">50% Infill</option>
+        <option value="100">100% Infill</option>
+    </select>
+
+    <label for="ownerMaterial">Select Material:</label>
+    <select id="ownerMaterial">
+        <option value="PLA">PLA - 60 PLN/kg</option>
+        <option value="PETG">PETG - 100 PLN/kg</option>
+    </select>
+
+    <label for="ownerCleanup">Select Cleanup Option:</label>
+    <input type="checkbox" id="ownerCleanupBasic" value="0.1"> Basic Cleanup (10% fee)
+    <br>
+    <input type="checkbox" id="ownerCleanupFull" value="0.5"> Full Cleanup and Sanding (50% fee)
+
+    <label for="printTime">Print Time (hours):</label>
+    <input type="number" id="printTime" min="0" step="0.1">
+
+    <label for="materialUsed">Material Used (grams):</label>
+    <input type="number" id="materialUsed" min="0" step="0.1">
+
+    <input type="button" value="Calculate Cost" onclick="calculateCost()">
+    <input type="button" value="Confirm and Download" onclick="confirmAndDownload()">
+</div>
+
+<h3>Cost Breakdown:</h3>
+<p id="materialCost">Material Cost: 0 PLN</p>
+<p id="electricityCost">Electricity Cost: 0 PLN</p>
+<p id="workFee">Work Fee (25%): 0 PLN</p>
+<p id="cleanupFee">Cleanup Fee: 0 PLN</p>
+<p id="totalCost">Total Cost: 0 PLN</p>
+
+<canvas id="costCanvas" width="600" height="400"></canvas>
+
+<script>
+    const filamentCostPerKgPLA = 60; // PLN
+    const filamentCostPerKgPETG = 100; // PLN
+    const electricityRatePerKwh = 0.80; // PLN
+    const powerConsumption = 150 / 1000; // kW
+    const workFeePercentage = 0.25; // 25%
+
+    let finalCostData = {};
+
+    function calculateCost() {
+        const email = document.getElementById('ownerEmail').value;
+        const objectLink = document.getElementById('ownerObjectLink').value;
+        const layerHeight = document.getElementById('ownerLayerHeight').value;
+        const infill = document.getElementById('ownerInfill').value;
+        const material = document.getElementById('ownerMaterial').value;
+        const printTime = parseFloat(document.getElementById('printTime').value);
+        const materialUsed = parseFloat(document.getElementById('materialUsed').value);
+
+        const cleanupBasicChecked = document.getElementById('ownerCleanupBasic').checked;
+        const cleanupFullChecked = document.getElementById('ownerCleanupFull').checked;
+
+        if (!email || !objectLink || isNaN(printTime) || isNaN(materialUsed)) {
+            alert("Please fill in all fields correctly.");
+            return;
+        }
+
+        const materialCostPerKg = material === 'PLA' ? filamentCostPerKgPLA : filamentCostPerKgPETG;
+        const materialCost = (materialUsed / 1000) * materialCostPerKg;
+        const electricityCost = printTime * powerConsumption * electricityRatePerKwh; // PLN
+        const workFee = (materialCost + electricityCost) * workFeePercentage;
+
+        let cleanupFee = 0;
+        if (cleanupBasicChecked) {
+            cleanupFee += (materialCost + electricityCost) * 0.10;
+        }
+        if (cleanupFullChecked) {
+            cleanupFee += (materialCost + electricityCost) * 0.50;
+        }
+
+        const totalCost = materialCost + electricityCost + workFee + cleanupFee;
+
+        document.getElementById('materialCost').innerText = `Material Cost: ${materialCost.toFixed(2)} PLN`;
+        document.getElementById('electricityCost').innerText = `Electricity Cost: ${electricityCost.toFixed(2)} PLN`;
+        document.getElementById('workFee').innerText = `Work Fee (25%): ${workFee.toFixed(2)} PLN`;
+        document.getElementById('cleanupFee').innerText = `Cleanup Fee: ${cleanupFee.toFixed(2)} PLN`;
+        document.getElementById('totalCost').innerText = `Total Cost: ${totalCost.toFixed(2)} PLN`;
+
+        finalCostData = {
+            email: email,
+            objectLink: objectLink,
+            layerHeight: layerHeight,
+            infill: infill,
+            material: material,
+            printTime: printTime,
+            materialUsed: materialUsed,
+            cleanupBasic: cleanupBasicChecked,
+            cleanupFull: cleanupFullChecked,
+            materialCost: materialCost.toFixed(2),
+            electricityCost: electricityCost.toFixed(2),
+            workFee: workFee.toFixed(2),
+            cleanupFee: cleanupFee.toFixed(2),
+            totalCost: totalCost.toFixed(2)
+        };
+
+        console.log(finalCostData);
+    }
+
+    function confirmAndDownload() {
+        if (Object.keys(finalCostData).length === 0) {
+            alert("Please calculate the cost before confirming.");
+            return;
+        }
+
+        const costBreakdown = `
+        Recipient Email: ${finalCostData.email}
+        Link to Object: ${finalCostData.objectLink}
+        Layer Height: ${finalCostData.layerHeight} mm
+        Infill Percentage: ${finalCostData.infill}%
+        Material: ${finalCostData.material}
+        Print Time: ${finalCostData.printTime} hours
+        Material Used: ${finalCostData.materialUsed} grams
+        Basic Cleanup: ${finalCostData.cleanupBasic ? 'Yes' : 'No'}
+        Full Cleanup and Sanding: ${finalCostData.cleanupFull ? 'Yes' : 'No'}
+
+        Cost Breakdown:
+        Material Cost: ${finalCostData.materialCost} PLN
+        Electricity Cost: ${finalCostData.electricityCost} PLN
+        Work Fee (25%): ${finalCostData.workFee} PLN
+        Cleanup Fee: ${finalCostData.cleanupFee} PLN
+        Total Cost: ${finalCostData.totalCost} PLN
+        `;
+
+        const blob = new Blob([costBreakdown], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = 'cost_breakdown.txt';
+        link.click();
+
+        generateJPG(costBreakdown);
+    }
+
+    function generateJPG(costBreakdown) {
+        const canvas = document.getElementById('costCanvas');
+        const context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.font = '16px Arial';
+        context.fillStyle = 'black';
+
+        const lines = costBreakdown.trim().split('\n');
+        let y = 20;
+
+        for (const line of lines) {
+            context.fillText(line.trim(), 10, y);
+            y += 20;
+        }
+
+        canvas.toBlob(function(blob) {
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'cost_breakdown.jpg';
+            link.click();
+        }, 'image/jpeg');
+    }
+</script>
+
+</body>
+</html>
